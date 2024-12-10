@@ -5,28 +5,27 @@ float mentalAge = 0;
 
 // Pin definitions
 const int ldrPins[10] = { 13, 12, 11, 10, 9, 8, 7, 6, 5, 4 };  // Analog pins for 10 LDRs
-const int buzzerPin = A5;                                      // Digital pin for the buzzer
-const int REDLED = A4;                                         // Digital pin for the first LED
-const int YELLOWLED = A3;
+const int buzzerPin = 3;                                      // Digital pin for the buzzer
+const int YELLOWLED = 2;                                       // Digital pin for the yellow LED
 
 void setup() {
   Serial.begin(9600);
 
   // Initialize the LDRs as input pins
   for (int i = 0; i < 10; i++) {
-    pinMode(ldrPins[i], INPUT);
+    pinMode(ldrPins[i], INPUT_PULLUP);
   }
 
   // Initialize the buzzer and LEDs as output pins
   pinMode(buzzerPin, OUTPUT);
-  pinMode(REDLED, OUTPUT);
   pinMode(YELLOWLED, OUTPUT);
 
   digitalWrite(buzzerPin, LOW);
-  digitalWrite(REDLED, LOW);
   digitalWrite(YELLOWLED, LOW);
 
-  signature();
+  digitalWrite(buzzerPin, HIGH);
+  delay(200);
+  digitalWrite(buzzerPin, LOW);
 }
 
 void loop() {
@@ -104,7 +103,7 @@ float startTest() {
   while (!blocksPlaced()) {
     if (readSignal() == 'X') {
       //Stop Test
-      red_and_beep();
+      yellow_and_beep();
       return 0;
     }
     y_blink();
@@ -114,7 +113,7 @@ float startTest() {
 
   // Calculate the time elapsed in seconds
   float elapsedTime = (endTime - startTime) / 1000;
-  red_and_beep();
+  yellow_and_beep();
   return elapsedTime;
 }
 
@@ -194,21 +193,17 @@ float calculateMA() {
 
 void signature() {
   digitalWrite(buzzerPin, HIGH);
-  digitalWrite(REDLED, HIGH);
   digitalWrite(YELLOWLED, HIGH);
-  delay(500);
+  delay(100);
   digitalWrite(buzzerPin, LOW);
-  digitalWrite(REDLED, LOW);
   digitalWrite(YELLOWLED, LOW);
-  delay(500);
+  delay(100);
   digitalWrite(buzzerPin, HIGH);
-  digitalWrite(REDLED, HIGH);
   digitalWrite(YELLOWLED, HIGH);
-  delay(500);
+  delay(100);
   digitalWrite(buzzerPin, LOW);
-  digitalWrite(REDLED, LOW);
   digitalWrite(YELLOWLED, LOW);
-  delay(500);
+  delay(100);
 }
 
 void y_blink() {
@@ -218,19 +213,17 @@ void y_blink() {
   delay(200);
 }
 
-void red_and_beep() {
-  digitalWrite(REDLED, HIGH);
+void yellow_and_beep() {
+  digitalWrite(YELLOWLED, HIGH);
   digitalWrite(buzzerPin, HIGH);
-  delay(1000);
-  digitalWrite(REDLED, LOW);
+  delay(100);
+  digitalWrite(YELLOWLED, LOW);
   digitalWrite(buzzerPin, LOW);
 }
 
-void red() {
-  digitalWrite(REDLED, HIGH);
-}
+
 void beep(){
   digitalWrite(buzzerPin, HIGH);
-  delay(1000);
+  delay(100);
   digitalWrite(buzzerPin, LOW);
 }
