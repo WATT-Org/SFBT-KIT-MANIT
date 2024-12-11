@@ -25,8 +25,7 @@ void resetPatientData() {
 }
 
 void sendReport() {
-  String s = String(test[0]) + '@' + String(test[1]) + '@' + String(test[2]) + '@' + String(mentalAge);
-  Serial.println(s);
+  Serial.println('D' + String(mentalAge));
 }
 
 void sendTestTime(int i) {
