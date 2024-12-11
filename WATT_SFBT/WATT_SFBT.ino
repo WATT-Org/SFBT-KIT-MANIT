@@ -4,56 +4,9 @@ float minTime = 0;
 float mentalAge = 0;
 
 // Pin definitions
-const int ldrPins[10] = { 13, 12, 11, 10, 9, 8, 7, 6, 5, 4 };  // Analog pins for 10 LDRs
-const int buzzerPin = 3;                                      // Digital pin for the buzzer
-const int YELLOWLED = 2;                                       // Digital pin for the yellow LED
-
-void setup() {
-  Serial.begin(9600);
-
-  // Initialize the LDRs as input pins
-  for (int i = 0; i < 10; i++) {
-    pinMode(ldrPins[i], INPUT_PULLUP);
-  }
-
-  // Initialize the buzzer and LEDs as output pins
-  pinMode(buzzerPin, OUTPUT);
-  pinMode(YELLOWLED, OUTPUT);
-
-  digitalWrite(buzzerPin, LOW);
-  digitalWrite(YELLOWLED, LOW);
-
-  digitalWrite(buzzerPin, HIGH);
-  delay(200);
-  digitalWrite(buzzerPin, LOW);
-}
-
-void loop() {
-
-  // put your main code here, to run repeatedly:
-  switch (readSignal()) {
-    case '1':  //Test 1
-      test[0] = startTest();
-      sendTestTime(0);
-      break;
-    case '2':  //Test 2
-      test[1] = startTest();
-      sendTestTime(1);
-      break;
-    case '3':  //Test 3
-      test[2] = startTest();
-      sendTestTime(0);
-      break;
-    case '4':  //Submit
-      totalTime = total();
-      minTime = minimum();
-      mentalAge = calculateMA();
-      sendReport();
-      resetPatientData();
-      signature();
-  }
-  delay(100);
-}
+const int ldrPins[] = { 13, 12, 11, 10, 9, 8, 7, 6, 5, 4 };  // Analog pins for 10 LDRs
+const int buzzerPin = 3;                                     // Digital pin for the buzzer
+const int YELLOWLED = 2;                                     // Digital pin for the yellow LED
 
 
 char readSignal() {
@@ -72,12 +25,14 @@ void resetPatientData() {
 }
 
 void sendReport() {
-  // TODO: Send Report to App
   String s = String(test[0]) + '@' + String(test[1]) + '@' + String(test[2]) + '@' + String(mentalAge);
+  Serial.println(s);
 }
 
 void sendTestTime(int i) {
   String s = String(test[i]);
+  char msgType[] = { 'A', 'B', 'C' };
+  Serial.print(msgType[i] + s);
 }
 
 float minimum() {
@@ -87,6 +42,7 @@ float minimum() {
   }
   return m;
 }
+
 float total() {
   float t = 0;
   for (int i = 0; i < 3; i++) {
@@ -118,11 +74,11 @@ float startTest() {
 }
 
 bool blocksPlaced() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < sizeof(ldrPins) / sizeof(ldrPins[0]); i++) {
     int ldrValue = digitalRead(ldrPins[i]);
-    if (ldrValue == 1) { return false; }
+    if (ldrValue == 0) return false;
+    else return true;
   }
-  return true;
 }
 
 float calculateMA() {
@@ -190,7 +146,6 @@ float calculateMA() {
   }
 }
 
-
 void signature() {
   digitalWrite(buzzerPin, HIGH);
   digitalWrite(YELLOWLED, HIGH);
@@ -222,8 +177,58 @@ void yellow_and_beep() {
 }
 
 
-void beep(){
+void beep() {
   digitalWrite(buzzerPin, HIGH);
   delay(100);
   digitalWrite(buzzerPin, LOW);
+}
+
+
+void setup() {
+  Serial.begin(9600);
+
+  // Initialize the LDRs
+  for (int i = 0; i < sizeof(ldrPins) / sizeof(ldrPins[0]); i++) {
+    pinMode(ldrPins[i], INPUT_PULLUP);
+  }
+
+  // Initialize the buzzer and LEDs as output pins
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(YELLOWLED, OUTPUT);
+
+  digitalWrite(buzzerPin, LOW);
+  digitalWrite(YELLOWLED, LOW);
+
+  signature();
+  delay(500);
+  digitalWrite(buzzerPin, HIGH);
+  delay(200);
+  digitalWrite(buzzerPin, LOW);
+}
+
+void loop() {
+
+  // put your main code here, to run repeatedly:
+  switch (readSignal()) {
+    case '1':  //Test 1
+      test[0] = startTest();
+      sendTestTime(0);
+      break;
+    case '2':  //Test 2
+      test[1] = startTest();
+      sendTestTime(1);
+      break;
+    case '3':  //Test 3
+      test[2] = startTest();
+      sendTestTime(2);
+      break;
+    case '4':  //Submit
+      totalTime = total();
+      minTime = minimum();
+      mentalAge = calculateMA();
+      sendReport();
+      resetPatientData();
+      signature();
+  }
+  delay(100);
 }
