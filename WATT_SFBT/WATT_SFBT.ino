@@ -25,7 +25,7 @@ void resetPatientData() {
 }
 
 void sendReport() {
-  Serial.println('D' + String(mentalAge));
+  Serial.print('D' + String(mentalAge));
 }
 
 void sendTestTime(int i) {
@@ -76,8 +76,8 @@ bool blocksPlaced() {
   for (int i = 0; i < sizeof(ldrPins) / sizeof(ldrPins[0]); i++) {
     int ldrValue = digitalRead(ldrPins[i]);
     if (ldrValue == 0) return false;
-    else return true;
   }
+  return true;
 }
 
 float calculateMA() {
